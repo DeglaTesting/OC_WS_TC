@@ -46,10 +46,10 @@ public class ItemValueDAO {
                 joResponse.put("Response", "Fail");
             } else {
                 joResponse.put("ErrCode", "0");
+                jaItemValues = new JSONArray();
                 while (rs.next()) {
                     JSONObject joValue = new JSONObject();
                     joValue.put("ItemValue", rs.getString("value"));
-                    jaItemValues = new JSONArray();
                     jaItemValues.put(joValue);
                 }
                 joResponse.put("Response", jaItemValues);
@@ -63,7 +63,6 @@ public class ItemValueDAO {
 
     public static void main(String[] args) {
         ItemValueDAO itemValue = new ItemValueDAO("Multiple sites test", "SID0000", "FirstName");
-        System.out.println( itemValue.getStudySubjectItemValue());
-
+        System.out.println(itemValue.getStudySubjectItemValue());
     }
 }
