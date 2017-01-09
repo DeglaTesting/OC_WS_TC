@@ -33,9 +33,11 @@ public class Connect {
         return connection;
     }
 
-    public void closeConnection() {
+    public static void closeConnection() {
         try {
-            this.connection.close();
+            Connect.connection.close();
+                            System.out.println("Connection closed !");
+
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }

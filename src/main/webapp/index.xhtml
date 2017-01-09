@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:growl id="growl" showDetail="true" autoUpdate="true" />
+            Hello from Facelets
+            <br/>
+            <h:panelGrid columns="2" style="margin-top:10px;">
+                <h:outputLabel for="itemName" value="Item name:" style="margin-right: 20px"/>
+                <p:inputText id="itemName" value="#{AppConfig.itemName}"/>
+            </h:panelGrid>
+            <p:commandButton value="Change" update="growl" type="submit" actionListener="#{AppConfig.changeItemName}" ajax="false"/>
+            <h3 style="color: #1565C0; margin-left: 30px; margin-top: 50px; text-decoration: underline">Please use this URL to access the web service:</h3>
+            <a href="#{AppConfig.setHostURi()}"> #{AppConfig.getHostUri()}</a>
+        </h:form>
+    </h:body>
+</html>
+
