@@ -11,9 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
@@ -29,11 +27,11 @@ import javax.ws.rs.core.Context;
 public class AppConfig {
 
     @Context
-    HttpServletRequest request;
+ HttpServletRequest request;
 
     private final File confFile;
     String itemName;
-    String hostUri;
+    String dbCredentials;
 
     public AppConfig() {
         String sFilePath = "";
@@ -103,22 +101,24 @@ public class AppConfig {
         }
     }
 
-    public void setHostURi() {
-        InetAddress ip = null;
-        String hostname = null;
+    public String getdbCredentials() {
+       BufferedReader br = null;
+        String dbCredentials = "";
         try {
-            ip = InetAddress.getLocalHost();
-            hostname = ip.getHostName();
-            System.out.println("Your current IP address : " + ip);
-            System.out.println("Your current Hostname : " + hostname);
-        } catch (UnknownHostException e) {
-            e.getMessage();
+            String sCurrentLine;
+            br = new BufferedReader(new java.io.FileReader(this.confFile));
+            while ((sCurrentLine = br.readLine()) != null) {
+                if (sCurrentLine.startsWith("OC_DB")) {
+                    dbCredentials = sCurrentLine;
+                    break;
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
-        hostUri = ip + hostname + "## ";
-    }
-
-    public String getHostUri() {
-        return hostUri;
+        System.out.println(dbCredentials);
+        return dbCredentials;
     }
 
 }

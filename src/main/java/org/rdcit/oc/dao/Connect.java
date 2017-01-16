@@ -16,6 +16,7 @@ import java.sql.SQLException;
 public class Connect {
 
      static Connection connection;
+
     
   
     public static Connection openConnection() {
