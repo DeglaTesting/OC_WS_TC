@@ -31,8 +31,7 @@ public class ItemValue {
     @Produces(MediaType.APPLICATION_JSON)
     public String getValue(@PathParam("studyName") String studyName, @PathParam("subjectID") String subjectID) {
         ItemValueDAO itemValueDao = new ItemValueDAO(studyName, subjectID);
-        String value = itemValueDao.getStudySubjectItemValue();
-        return value;
+        return itemValueDao.getStudySubjectItemValue();
     }
 
 }

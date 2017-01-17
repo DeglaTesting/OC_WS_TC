@@ -5,6 +5,7 @@
  */
 package org.rdcit.oc.dao;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,12 +24,17 @@ public class ItemValueDAO {
     String subjectID;
     String itemName;
     JSONArray jaItemValues;
+    Connect connect;
+    Connection connection;
 
     public ItemValueDAO(String studyName, String subjectID) {
         this.studyName = studyName;
         this.subjectID = subjectID;
-        AppConfig appConfig = new AppConfig();
+        AppConfig appConfig = AppConfig.getAppConfig();
         this.itemName = appConfig.getItemName();
+        System.out.println("AppConfig item name " + itemName);
+        connect = new Connect();
+        connection = connect.openConnection();
     }
 
     public String getStudySubjectItemValue() {
@@ -36,7 +42,7 @@ public class ItemValueDAO {
         JSONObject joResponse = new JSONObject();
         joResponse.put("Service", "RDCIT");
         try {
-            PreparedStatement stmt = Connect.openConnection().prepareStatement("SELECT * FROM item_data "
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM item_data "
                     + "INNER JOIN item_form_metadata ON item_data.item_id = item_form_metadata.item_id "
                     + "INNER JOIN study ON study.owner_id = item_data.owner_id "
                     + "INNER JOIN study_subject ON study_subject.study_id =  study.study_id"
@@ -44,7 +50,6 @@ public class ItemValueDAO {
                     + "' AND study_subject.label = '" + this.subjectID
                     + "' AND item_form_metadata.left_item_text = '" + this.itemName + "';");
             ResultSet rs = stmt.executeQuery();
-
             if (!rs.next()) {
                 if (checkItemName()) {
                     joResponse.put("ErrCode", "1");
@@ -67,13 +72,14 @@ public class ItemValueDAO {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
+        connect.closeConnection();
         return value;
     }
 
     public boolean checkItemName() {
         boolean exist = false;
         try {
-            Statement stmt = Connect.openConnection().createStatement();
+            Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT left_item_text FROM item_form_metadata "
                     + "INNER JOIN item_data ON item_data.item_id = item_form_metadata.item_id "
                     + "INNER JOIN study ON study.owner_id = item_data.owner_id "

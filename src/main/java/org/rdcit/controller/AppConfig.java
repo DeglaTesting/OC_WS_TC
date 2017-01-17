@@ -6,43 +6,42 @@
 package org.rdcit.controller;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 
 /**
  *
  * @author sa841
  */
-@ManagedBean(name = "AppConfig")
 public class AppConfig {
-
-    @Context
- HttpServletRequest request;
-
-    private final File confFile;
+    // For the server
+    //private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath().replace("AppConfig.class", "OcRestWS.conf") ;
+   private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath()+ "OcRestWS.conf";
+    private File confFile = new File(confFilePath);
     String itemName;
     String dbCredentials;
+    public String hostAddress;
+    public String hostPort;
+    public String dbName;
+    public String dbUserName;
+    public String dbUserPwd;
 
-    public AppConfig() {
-        String sFilePath = "";
-        URL location = AppConfig.class.getProtectionDomain().getCodeSource().getLocation();
-        sFilePath = location.getFile();
-        sFilePath = sFilePath.replace("AppConfig.class", "");
-        confFile = new File(sFilePath + "OcRestWS.conf");
+    private static AppConfig appConfig = null;
+
+    private AppConfig() {
     }
 
-    public String getConfFile() {
-        return confFile.getAbsolutePath();
+    public static AppConfig getAppConfig() {
+        if (appConfig == null) {
+            appConfig = new AppConfig();
+            appConfig.setdbCredentials();
+        }
+        return appConfig;
+    }
+
+    public String getConfFilePath() {
+        return confFilePath;
     }
 
     public String getItemName() {
@@ -50,7 +49,7 @@ public class AppConfig {
         String lItemName = "";
         try {
             String sCurrentLine;
-            br = new BufferedReader(new java.io.FileReader(this.confFile));
+            br = new BufferedReader(new FileReader(confFile));
             while ((sCurrentLine = br.readLine()) != null) {
                 if (sCurrentLine.startsWith("itemName")) {
                     lItemName = sCurrentLine;
@@ -67,46 +66,11 @@ public class AppConfig {
         return itemName;
     }
 
-    public void setItemName(String newItemName) {
-        if (newItemName.length() > 1) {
-            this.itemName = newItemName;
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error", "Item name cannot be empty"));
-        }
-    }
-
-    public void changeItemName(ActionEvent event) {
-        try {
-            File tmp = File.createTempFile("OcRestWSTMP", "txt");
-            BufferedReader br = new BufferedReader(new FileReader(this.confFile));
-            BufferedWriter bw = new BufferedWriter(new FileWriter(tmp));
-            String sCurrentLine;
-            while ((sCurrentLine = br.readLine()) != null) {
-                if (sCurrentLine.startsWith("itemName")) {
-                    sCurrentLine = "itemName=".concat(itemName);
-                    bw.write(String.format("%s%n", sCurrentLine));
-                    // break;
-                } else {
-                    bw.write(String.format("%s%n", sCurrentLine));
-                }
-            }
-            br.close();
-            bw.close();
-            File oldFile = new File(this.confFile.getAbsolutePath());
-            if (oldFile.delete()) {
-                tmp.renameTo(oldFile);
-            }
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    public String getdbCredentials() {
-       BufferedReader br = null;
-        String dbCredentials = "";
+    public void setdbCredentials() {
+        BufferedReader br = null;
         try {
             String sCurrentLine;
-            br = new BufferedReader(new java.io.FileReader(this.confFile));
+            br = new BufferedReader(new java.io.FileReader(confFile));
             while ((sCurrentLine = br.readLine()) != null) {
                 if (sCurrentLine.startsWith("OC_DB")) {
                     dbCredentials = sCurrentLine;
@@ -118,7 +82,16 @@ public class AppConfig {
             System.out.println(e.getMessage());
         }
         System.out.println(dbCredentials);
-        return dbCredentials;
+        String[] arrDbCredentials = dbCredentials.split("\t");
+        hostAddress = arrDbCredentials[1];
+        hostPort = arrDbCredentials[2];
+        dbName = arrDbCredentials[3];
+        dbUserName = arrDbCredentials[4];
+        dbUserPwd = arrDbCredentials[5];
+        System.out.println("hostAddress = " + hostAddress);
+        System.out.println("hostPort = " + hostPort);
+        System.out.println("dbName = " + dbName);
+        System.out.println("dbUserName = " + dbUserName);
+        System.out.println("dbUserPwd = " + dbUserPwd);
     }
-
 }
