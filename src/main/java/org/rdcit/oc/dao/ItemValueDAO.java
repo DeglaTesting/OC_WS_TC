@@ -27,11 +27,10 @@ public class ItemValueDAO {
     Connection connection;
 
     public ItemValueDAO(String studyName, String subjectID) {
-        this.studyName = studyName;
-        this.subjectID = subjectID;
+        studyName = studyName;
+        subjectID = subjectID;
         AppConfig appConfig = AppConfig.getAppConfig();
-        this.itemName = appConfig.getItemName();
-        System.out.println("AppConfig item name " + itemName);
+        itemName = appConfig.getItemName();
         connect = new Connect();
         connection = connect.openConnection();
     }
@@ -45,9 +44,9 @@ public class ItemValueDAO {
                     + "INNER JOIN item_form_metadata ON item_data.item_id = item_form_metadata.item_id "
                     + "INNER JOIN study ON study.owner_id = item_data.owner_id "
                     + "INNER JOIN study_subject ON study_subject.study_id =  study.study_id"
-                    + " WHERE study.name = '" + this.studyName
-                    + "' AND study_subject.label = '" + this.subjectID
-                    + "' AND item_form_metadata.left_item_text = '" + this.itemName + "';",
+                    + " WHERE study.name = '" + studyName
+                    + "' AND study_subject.label = '" + subjectID
+                    + "' AND item_form_metadata.left_item_text = '" + itemName + "';",
                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs = stmt.executeQuery();
             rs.last();
@@ -93,12 +92,11 @@ public class ItemValueDAO {
                     + "INNER JOIN item_data ON item_data.item_id = item_form_metadata.item_id "
                     + "INNER JOIN study ON study.owner_id = item_data.owner_id "
                     + "INNER JOIN study_subject ON study_subject.study_id =  study.study_id"
-                    + " WHERE study.name = '" + this.studyName
-                    + "' AND study_subject.label = '" + this.subjectID + "';");
+                    + " WHERE study.name = '" + studyName
+                    + "' AND study_subject.label = '" + subjectID + "';");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                System.out.println("@crf.left_item_text " + rs.getString("left_item_text"));
-                if (rs.getString("left_item_text").equals(this.itemName)) {
+                if (rs.getString("left_item_text").equals(itemName)) {
                     exist = true;
                     break;
                 }
@@ -110,8 +108,8 @@ public class ItemValueDAO {
         return exist;
     }
 
-    public static void main(String[] args) {
+    /*   public static void main(String[] args) {
         ItemValueDAO itemValue = new ItemValueDAO("Multiple sites test", "SID0000");
         System.out.println(itemValue.getStudySubjectItemValue());
-    }
+    }*/
 }

@@ -16,9 +16,9 @@ import java.io.IOException;
  */
 public class AppConfig {
 
-    // For the server
-    //private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath().replace("AppConfig.class", "OcRestWS.conf") ;
-    private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "OcRestWS.conf";
+   
+    private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath().replace("AppConfig.class", "OcRestWS.conf") ;
+    //private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "OcRestWS.conf";
     private File confFile = new File(confFilePath);
     String itemName;
     String dbCredentials;
