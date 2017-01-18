@@ -22,13 +22,12 @@ public class ItemValueDAO {
     String studyName;
     String subjectID;
     String itemName;
-    JSONArray jaItemValues;
     Connect connect;
     Connection connection;
 
     public ItemValueDAO(String studyName, String subjectID) {
-        studyName = studyName;
-        subjectID = subjectID;
+        this.studyName = studyName;
+        this.subjectID = subjectID;
         AppConfig appConfig = AppConfig.getAppConfig();
         itemName = appConfig.getItemName();
         connect = new Connect();
@@ -55,10 +54,10 @@ public class ItemValueDAO {
                 case 0:
                     if (checkItemName()) {
                         joResponse.put("ErrCode", "1");
-                        joResponse.put("Response", "null");
+                        joResponse.put("Response", "");
                     } else {
                         joResponse.put("ErrCode", "3");
-                        joResponse.put("Response", "null");
+                        joResponse.put("Response", "");
                     }
                     break;
                 case 1:
@@ -66,15 +65,8 @@ public class ItemValueDAO {
                     joResponse.put("Response", rs.getString("value"));
                     break;
                 default:
-                    rs.beforeFirst();
                     joResponse.put("ErrCode", "2");
-                    jaItemValues = new JSONArray();
-                    while (rs.next()) {
-                        JSONObject joValue = new JSONObject();
-                        joValue.put("ItemValue", rs.getString("value"));
-                        jaItemValues.put(joValue);
-                    }
-                    joResponse.put("Response", jaItemValues);
+                    joResponse.put("Response", "");
                     break;
             }
             value = joResponse.toString();
@@ -108,7 +100,7 @@ public class ItemValueDAO {
         return exist;
     }
 
-    /*   public static void main(String[] args) {
+    /*public static void main(String[] args) {
         ItemValueDAO itemValue = new ItemValueDAO("Multiple sites test", "SID0000");
         System.out.println(itemValue.getStudySubjectItemValue());
     }*/
