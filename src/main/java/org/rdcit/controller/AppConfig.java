@@ -15,9 +15,10 @@ import java.io.IOException;
  * @author sa841
  */
 public class AppConfig {
+
     // For the server
     //private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath().replace("AppConfig.class", "OcRestWS.conf") ;
-   private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath()+ "OcRestWS.conf";
+    private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "OcRestWS.conf";
     private File confFile = new File(confFilePath);
     String itemName;
     String dbCredentials;
@@ -62,7 +63,6 @@ public class AppConfig {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        System.out.println(itemName);
         return itemName;
     }
 
@@ -81,17 +81,11 @@ public class AppConfig {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        System.out.println(dbCredentials);
         String[] arrDbCredentials = dbCredentials.split("\t");
         hostAddress = arrDbCredentials[1];
         hostPort = arrDbCredentials[2];
         dbName = arrDbCredentials[3];
         dbUserName = arrDbCredentials[4];
         dbUserPwd = arrDbCredentials[5];
-        System.out.println("hostAddress = " + hostAddress);
-        System.out.println("hostPort = " + hostPort);
-        System.out.println("dbName = " + dbName);
-        System.out.println("dbUserName = " + dbUserName);
-        System.out.println("dbUserPwd = " + dbUserPwd);
     }
 }

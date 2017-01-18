@@ -9,7 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rdcit.controller.AppConfig;
@@ -42,31 +41,42 @@ public class ItemValueDAO {
         JSONObject joResponse = new JSONObject();
         joResponse.put("Service", "RDCIT");
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM item_data "
+            PreparedStatement stmt = connection.prepareStatement("SELECT value FROM item_data "
                     + "INNER JOIN item_form_metadata ON item_data.item_id = item_form_metadata.item_id "
                     + "INNER JOIN study ON study.owner_id = item_data.owner_id "
                     + "INNER JOIN study_subject ON study_subject.study_id =  study.study_id"
                     + " WHERE study.name = '" + this.studyName
                     + "' AND study_subject.label = '" + this.subjectID
-                    + "' AND item_form_metadata.left_item_text = '" + this.itemName + "';");
+                    + "' AND item_form_metadata.left_item_text = '" + this.itemName + "';",
+                    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs = stmt.executeQuery();
-            if (!rs.next()) {
-                if (checkItemName()) {
-                    joResponse.put("ErrCode", "1");
-                    joResponse.put("Response", "null");
-                } else {
+            rs.last();
+            int countRS = rs.getRow();
+            switch (countRS) {
+                case 0:
+                    if (checkItemName()) {
+                        joResponse.put("ErrCode", "1");
+                        joResponse.put("Response", "null");
+                    } else {
+                        joResponse.put("ErrCode", "3");
+                        joResponse.put("Response", "null");
+                    }
+                    break;
+                case 1:
+                    joResponse.put("ErrCode", "0");
+                    joResponse.put("Response", rs.getString("value"));
+                    break;
+                default:
+                    rs.beforeFirst();
                     joResponse.put("ErrCode", "2");
-                    joResponse.put("Response", "Item name is not valid");
-                }
-            } else {
-                joResponse.put("ErrCode", "0");
-                jaItemValues = new JSONArray();
-                while (rs.next()) {
-                    JSONObject joValue = new JSONObject();
-                    joValue.put("ItemValue", rs.getString("value"));
-                    jaItemValues.put(joValue);
-                }
-                joResponse.put("Response", jaItemValues);
+                    jaItemValues = new JSONArray();
+                    while (rs.next()) {
+                        JSONObject joValue = new JSONObject();
+                        joValue.put("ItemValue", rs.getString("value"));
+                        jaItemValues.put(joValue);
+                    }
+                    joResponse.put("Response", jaItemValues);
+                    break;
             }
             value = joResponse.toString();
         } catch (SQLException ex) {
@@ -79,13 +89,13 @@ public class ItemValueDAO {
     public boolean checkItemName() {
         boolean exist = false;
         try {
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT left_item_text FROM item_form_metadata "
+            PreparedStatement stmt = connection.prepareStatement("SELECT left_item_text FROM item_form_metadata "
                     + "INNER JOIN item_data ON item_data.item_id = item_form_metadata.item_id "
                     + "INNER JOIN study ON study.owner_id = item_data.owner_id "
                     + "INNER JOIN study_subject ON study_subject.study_id =  study.study_id"
                     + " WHERE study.name = '" + this.studyName
                     + "' AND study_subject.label = '" + this.subjectID + "';");
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 System.out.println("@crf.left_item_text " + rs.getString("left_item_text"));
                 if (rs.getString("left_item_text").equals(this.itemName)) {

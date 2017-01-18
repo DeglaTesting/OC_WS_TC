@@ -16,18 +16,13 @@ import org.rdcit.controller.AppConfig;
  */
 public class Connect {
 
-     Connection connection;
+    Connection connection;
 
-    public  Connection openConnection() {
-     AppConfig appConfig = AppConfig.getAppConfig();
+    public Connection openConnection() {
+        AppConfig appConfig = AppConfig.getAppConfig();
         try {
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection("jdbc:postgresql://" + appConfig.hostAddress + ":" + appConfig.hostPort + "/" + appConfig.dbName, appConfig.dbUserName, appConfig.dbUserPwd);
-            if (connection != null) {
-                System.out.println("You made it, take control your database now!");
-            } else {
-                System.out.println("Failed to make connection!");
-            }
         } catch (ClassNotFoundException | SQLException ex) {
             System.out.println(ex.getMessage());
         }
@@ -37,7 +32,6 @@ public class Connect {
     public void closeConnection() {
         try {
             connection.close();
-            System.out.println("Connection closed !");
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
