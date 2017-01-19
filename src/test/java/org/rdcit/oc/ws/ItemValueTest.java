@@ -25,10 +25,10 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  * @author sa841
  */
-@RunWith(MockitoJUnitRunner.class)
+//@RunWith(MockitoJUnitRunner.class)
 public class ItemValueTest {
 
-    @Mock
+   /* @Mock
     ItemValue mockItemValue;
 
     @Test
@@ -67,6 +67,6 @@ public class ItemValueTest {
         }
         System.out.println("Test was successful " + result.wasSuccessful());
 
-    }
+    }*/
 
 }

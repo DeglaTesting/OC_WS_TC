@@ -16,7 +16,7 @@ import org.rdcit.oc.dao.ItemValueDAO;
  *
  * @author sa841
  */
-@Path("itemValue/{studyName}/{subjectID}")
+@Path("itemValue/{studyName}/{crfName}/{crfVersion}/{subjectID}")
 public class ItemValue {
 
     /**
@@ -24,13 +24,15 @@ public class ItemValue {
      * the client as "JSON" media type.
      *
      * @param studyName
+     * @param crfName
+     * @param crfVersion
      * @param subjectID
      * @return String that will be returned as a JSON response.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getValue(@PathParam("studyName") String studyName, @PathParam("subjectID") String subjectID) {
-        ItemValueDAO itemValueDao = new ItemValueDAO(studyName, subjectID);
+    public String getValue(@PathParam("studyName") String studyName, @PathParam("crfName") String crfName, @PathParam("crfVersion") String crfVersion, @PathParam("subjectID") String subjectID ) {
+        ItemValueDAO itemValueDao = new ItemValueDAO(studyName, crfName, crfVersion, subjectID);
         return itemValueDao.getStudySubjectItemValue();
     }
 

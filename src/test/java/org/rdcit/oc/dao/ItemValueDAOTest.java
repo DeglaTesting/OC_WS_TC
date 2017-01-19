@@ -18,10 +18,10 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  * @author sa841
  */
-@RunWith(MockitoJUnitRunner.class)
+//@RunWith(MockitoJUnitRunner.class)
 public class ItemValueDAOTest {
 
-    @Mock
+    /*@Mock
     ItemValueDAO mockItemValueDao;
 
     @Test
@@ -36,6 +36,6 @@ public class ItemValueDAOTest {
             System.out.println(failure.getMessage());
         }
         System.out.println("The test was successful: " +result.wasSuccessful());
-    }
+    }*/
 
 }
