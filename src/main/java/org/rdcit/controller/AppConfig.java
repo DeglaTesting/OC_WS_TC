@@ -16,16 +16,16 @@ import java.io.IOException;
  */
 public class AppConfig {
 
-    private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath().replace("AppConfig.class", "OcRestWS.conf") ;
-   // private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "OcRestWS.conf";
+    //private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath().replace("AppConfig.class", "OcRestWS.conf");
+    //private final String confFilePath = "OcRestWS.conf";
+    private final String confFilePath = AppConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "OcRestWS.conf";
     private File confFile = new File(confFilePath);
-    String itemName;
-    String dbCredentials;
-    public String hostAddress;
-    public String hostPort;
-    public String dbName;
-    public String dbUserName;
-    public String dbUserPwd;
+    private String itemName;
+    private String hostAddress;
+    private String hostPort;
+    private String dbName;
+    private String dbUserName;
+    private String dbUserPwd;
 
     private static AppConfig appConfig = null;
 
@@ -35,7 +35,7 @@ public class AppConfig {
     public static AppConfig getAppConfig() {
         if (appConfig == null) {
             appConfig = new AppConfig();
-            appConfig.setdbCredentials();
+            appConfig.setParameters();
         }
         return appConfig;
     }
@@ -44,53 +44,56 @@ public class AppConfig {
         return confFilePath;
     }
 
-    public String getItemName() {
-        BufferedReader br = null;
+    public void setParameters() {
+        BufferedReader br;
         String lItemName = "";
+        String dbCredentials = "";
         try {
             String sCurrentLine;
             br = new BufferedReader(new FileReader(confFile));
             while ((sCurrentLine = br.readLine()) != null) {
                 if (sCurrentLine.startsWith("itemName")) {
                     lItemName = sCurrentLine;
-                    break;
+                } else if (sCurrentLine.startsWith("OC_DB")) {
+                    dbCredentials = sCurrentLine;
                 }
             }
             br.close();
             String[] arIteName = lItemName.split("=");
+            String[] arrDbCredentials = dbCredentials.split("\t");
             itemName = arIteName[1];
+            hostAddress = arrDbCredentials[1];
+            hostPort = arrDbCredentials[2];
+            dbName = arrDbCredentials[3];
+            dbUserName = arrDbCredentials[4];
+            dbUserPwd = arrDbCredentials[5];
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public String getItemName() {
         return itemName;
     }
 
-    public void setdbCredentials() {
-        BufferedReader br = null;
-        try {
-            String sCurrentLine;
-            br = new BufferedReader(new java.io.FileReader(confFile));
-            while ((sCurrentLine = br.readLine()) != null) {
-                if (sCurrentLine.startsWith("OC_DB")) {
-                    dbCredentials = sCurrentLine;
-                    break;
-                }
-            }
-            br.close();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-        String[] arrDbCredentials = dbCredentials.split("\t");
-        hostAddress = arrDbCredentials[1];
-        hostPort = arrDbCredentials[2];
-        dbName = arrDbCredentials[3];
-        dbUserName = arrDbCredentials[4];
-        dbUserPwd = arrDbCredentials[5];
-        System.out.println(dbCredentials);
-        System.out.println("hostAddress = " + hostAddress);
-        System.out.println("hostPort = " + hostPort);
-        System.out.println("dbName = " + dbName);
-        System.out.println("dbUserName = " + dbUserName);
-        System.out.println("dbUserPwd = " + dbUserPwd);
+    public String getHostAddress() {
+        return hostAddress;
     }
+
+    public String getHostPort() {
+        return hostPort;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public String getDbUserName() {
+        return dbUserName;
+    }
+
+    public String getDbUserPwd() {
+        return dbUserPwd;
+    }
+
 }

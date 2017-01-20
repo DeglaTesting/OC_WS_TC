@@ -25,10 +25,10 @@ public class ItemValueDAO {
     String crfVersion;
     Connect connect;
     Connection connection;
-     AppConfig appConfig;
+    AppConfig appConfig;
+    JSONObject joResponse;
 
     public ItemValueDAO(String studyName, String crfName, String crfVersion, String subjectID) {
-        try{
         this.studyName = studyName;
         this.subjectID = subjectID;
         this.crfName = crfName;
@@ -37,15 +37,12 @@ public class ItemValueDAO {
         itemName = appConfig.getItemName();
         connect = new Connect();
         connection = connect.openConnection();
-        }catch(Exception ex){
-            System.out.println("Can not find the config file "+ appConfig.getConfFilePath());
-        }
+        joResponse = new JSONObject();
+        joResponse.put("Service", "RDCIT");
     }
 
     public String getStudySubjectItemValue() {
         String value = "";
-        JSONObject joResponse = new JSONObject();
-        joResponse.put("Service", "RDCIT");
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT value FROM item_data "
                     + "INNER JOIN item_form_metadata ON item_data.item_id = item_form_metadata.item_id\n"
@@ -56,12 +53,17 @@ public class ItemValueDAO {
                     + "INNER JOIN study_subject ON study_subject.study_subject_id = event_crf.study_subject_id\n"
                     + "INNER JOIN crf_version ON crf_version.crf_version_id = event_crf.crf_version_id\n"
                     + "INNER JOIN crf ON crf.crf_id = crf_version.crf_id\n"
-                    + "WHERE study.name = '"+studyName+"' "
-                    + "AND study_subject.label = '"+subjectID+"' "
-                    + "AND item_form_metadata.left_item_text = '"+itemName+"' "
-                    + "AND crf.name = '"+crfName+"' "
-                    + "AND crf_version.name = '"+crfVersion+"';",
+                    + "WHERE study.name = ?"
+                    + "AND study_subject.label = ? "
+                    + "AND item_form_metadata.left_item_text = ? "
+                    + "AND crf.name = ? "
+                    + "AND crf_version.name = ?;",
                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setString(1, studyName);
+            stmt.setString(2, subjectID);
+            stmt.setString(3, itemName);
+            stmt.setString(4, crfName);
+            stmt.setString(5, crfVersion);
             ResultSet rs = stmt.executeQuery();
             rs.last();
             int countRS = rs.getRow();
@@ -70,18 +72,22 @@ public class ItemValueDAO {
                     if (checkItemName()) {
                         joResponse.put("ErrCode", "1");
                         joResponse.put("Response", "");
+                        joResponse.put("Message", "The value is empty");
                     } else {
                         joResponse.put("ErrCode", "3");
                         joResponse.put("Response", "");
+                        joResponse.put("Message", "The item name does not exist.");
                     }
                     break;
                 case 1:
                     joResponse.put("ErrCode", "0");
                     joResponse.put("Response", rs.getString("value"));
+                    joResponse.put("Message", "OK");
                     break;
                 default:
                     joResponse.put("ErrCode", "2");
                     joResponse.put("Response", "");
+                    joResponse.put("Message", "Multiple values was found.");
                     break;
             }
             value = joResponse.toString();
@@ -99,8 +105,11 @@ public class ItemValueDAO {
                     + "INNER JOIN item_data ON item_data.item_id = item_form_metadata.item_id "
                     + "INNER JOIN study ON study.owner_id = item_data.owner_id "
                     + "INNER JOIN study_subject ON study_subject.study_id =  study.study_id"
-                    + " WHERE study.name = '" + studyName
-                    + "' AND study_subject.label = '" + subjectID + "';");
+                    + " WHERE study.name = ?"
+                    + " AND study_subject.label = ?;");
+            stmt.setString(1, studyName);
+            stmt.setString(2, subjectID);
+     
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 if (rs.getString("left_item_text").equals(itemName)) {
@@ -115,7 +124,7 @@ public class ItemValueDAO {
         return exist;
     }
 
-   public static void main(String[] args) {
+    public static void main(String[] args) {
         ItemValueDAO itemValue = new ItemValueDAO("Tool Test Study", "PhenoIntegrator", "v1.0", "bob001");
         System.out.println(itemValue.getStudySubjectItemValue());
     }

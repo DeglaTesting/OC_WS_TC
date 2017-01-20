@@ -16,13 +16,15 @@ import org.rdcit.controller.AppConfig;
  */
 public class Connect {
 
-   Connection connection;
+    Connection connection;
+    private AppConfig appConfig;
 
-     public  Connection openConnection() {
-     AppConfig appConfig = AppConfig.getAppConfig();
+    public Connection openConnection() {
+        appConfig = AppConfig.getAppConfig();
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://" + appConfig.hostAddress + ":" + appConfig.hostPort + "/" + appConfig.dbName, appConfig.dbUserName, appConfig.dbUserPwd);
+            connection = DriverManager.getConnection("jdbc:postgresql://" + appConfig.getHostAddress() + ":" + appConfig.getHostPort() + "/"
+                    + appConfig.getDbName(), appConfig.getDbUserName(), appConfig.getDbUserPwd());
             if (connection != null) {
                 System.out.println("You made it, take control your database now!");
             } else {

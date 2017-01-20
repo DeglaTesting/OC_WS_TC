@@ -5,11 +5,13 @@
  */
 package org.rdcit.oc.ws;
 
+import java.sql.SQLException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import org.json.JSONObject;
 import org.rdcit.oc.dao.ItemValueDAO;
 
 /**
@@ -31,9 +33,24 @@ public class ItemValue {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getValue(@PathParam("studyName") String studyName, @PathParam("crfName") String crfName, @PathParam("crfVersion") String crfVersion, @PathParam("subjectID") String subjectID ) {
-        ItemValueDAO itemValueDao = new ItemValueDAO(studyName, crfName, crfVersion, subjectID);
-        return itemValueDao.getStudySubjectItemValue();
+    public String getValue(@PathParam("studyName") String studyName, @PathParam("crfName") String crfName, @PathParam("crfVersion") String crfVersion, @PathParam("subjectID") String subjectID) {
+        try {
+            ItemValueDAO itemValueDao = new ItemValueDAO(studyName, crfName, crfVersion, subjectID);
+            return itemValueDao.getStudySubjectItemValue();
+        } catch(Exception ex) {
+            JSONObject joResponse = new JSONObject();
+            joResponse.put("Service", "RDCIT");
+            joResponse.put("Response", "");
+            if (SQLException.class.isInstance(ex)) {
+                 joResponse.put("ErrCode", "4");
+                joResponse.put("Message", "Connection to the db has failed!");
+            } else {
+                joResponse.put("ErrCode", "5");
+                joResponse.put("Message", "The configuration file was not found!");
+            }
+            return joResponse.toString();
+        }
+
     }
 
 }
